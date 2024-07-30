@@ -3,6 +3,7 @@ import time
 import logging
 from aiogram import Bot
 import asyncio
+from m import *
 
 API_TOKEN = '7399735507:AAHrbAgM3NLApic89e57d1C87U-0876Sg-8'
 ADMIN_ID = '6092284993'
