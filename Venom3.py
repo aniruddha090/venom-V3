@@ -7,10 +7,14 @@ import asyncio
 from asyncio.exceptions import TimeoutError
 from keep_alive import keep_alive
 import signal
+from dotenv import load_dotenv
 
-# Load environment variables
-API_TOKEN = os.getenv('7399735507:AAHrbAgM3NLApic89e57d1C87U-0876Sg-8')
-ADMIN_ID = os.getenv('6092284993')
+# Load environment variables from .env file
+load_dotenv()
+
+# Fetch environment variables
+API_TOKEN = os.getenv('API_TOKEN')
+ADMIN_ID = os.getenv('ADMIN_ID')
 MAX_RESTARTS = int(os.getenv('MAX_RESTARTS', 5))
 RESTART_PERIOD = int(os.getenv('RESTART_PERIOD', 60))  # Seconds
 CHECK_INTERVAL = int(os.getenv('CHECK_INTERVAL', 5))  # Seconds
