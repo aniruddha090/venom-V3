@@ -5,6 +5,7 @@ import os
 import random
 import string
 import json
+import asyncio
 
 from keep_alive import keep_alive
 keep_alive()
@@ -96,7 +97,7 @@ def add_time_to_current_date(hours=0, days=0):
     return (datetime.datetime.now() + datetime.timedelta(hours=hours, days=days)).strftime('%Y-%m-%d %H:%M:%S')
 
 @bot.message_handler(commands=['genkey'])
-def generate_key_command(message):
+async def generate_key_command(message):
     user_id = str(message.chat.id)
     if user_id in admin_id:
         command = message.text.split()
@@ -121,10 +122,10 @@ def generate_key_command(message):
     else:
         response = "Only the admin can perform this action."
 
-    bot.reply_to(message, response)
+    await bot.reply_to(message, response)
 
 @bot.message_handler(commands=['redeem'])
-def redeem_key_command(message):
+async def redeem_key_command(message):
     user_id = str(message.chat.id)
     command = message.text.split()
     if len(command) == 2:
@@ -146,17 +147,17 @@ def redeem_key_command(message):
     else:
         response = "Usage: /redeem <key>"
 
-    bot.reply_to(message, response)
+    await bot.reply_to(message, response)
 
 @bot.message_handler(commands=['bgmi'])
-def handle_bgmi(message):
+async def handle_bgmi(message):
     user_id = str(message.chat.id)
     
     if user_id in users:
         expiration_date = datetime.datetime.strptime(users[user_id], '%Y-%m-%d %H:%M:%S')
         if datetime.datetime.now() > expiration_date:
             response = "Access expired. Please redeem a new key using /redeem <key>."
-            bot.reply_to(message, response)
+            await bot.reply_to(message, response)
             return
         
         if user_id not in admin_id:
@@ -165,14 +166,14 @@ def handle_bgmi(message):
                 if time_since_last_attack < COOLDOWN_TIME:
                     cooldown_remaining = COOLDOWN_TIME - time_since_last_attack
                     response = f"Please wait {cooldown_remaining} seconds before using /bgmi again."
-                    bot.reply_to(message, response)
+                    await bot.reply_to(message, response)
                     return
                 
                 if consecutive_attacks.get(user_id, 0) >= CONSECUTIVE_ATTACKS_LIMIT:
                     if time_since_last_attack < CONSECUTIVE_ATTACKS_COOLDOWN:
                         cooldown_remaining = CONSECUTIVE_ATTACKS_COOLDOWN - time_since_last_attack
                         response = f"Please wait {cooldown_remaining} seconds before using another command."
-                        bot.reply_to(message, response)
+                        await bot.reply_to(message, response)
                         return
                     else:
                         consecutive_attacks[user_id] = 0
@@ -202,21 +203,26 @@ def handle_bgmi(message):
     else:
         response = "Access denied. Please redeem a key first."
 
-    bot.reply_to(message, response)
+    await bot.reply_to(message, response)
 
-def start_attack_reply(message, target, port, time):
+async def start_attack_reply(message, target, port, time):
     user_info = message.from_user
     username = user_info.username if user_info.username else user_info.first_name
     response = f"{username}, attack started.\n\nTarget: {target}\nPort: {port}\nTime: {time} seconds\nMethod: Standard Attack"
-    bot.reply_to(message, response)
+    await bot.reply_to(message, response)
 
 @bot.message_handler(commands=['clearlogs'])
-def clear_logs_command(message):
+async def clear_logs_command(message):
     user_id = str(message.chat.id)
     if user_id in admin_id:
         response = clear_logs()
     else:
         response = "Only the admin can perform this action."
-    bot.reply_to(message, response)
+    await bot.reply_to(message, response)
 
-@bot.message
+def main():
+    load_data()
+    asyncio.run(bot.polling())
+
+if __name__ == "__main__":
+    main()
