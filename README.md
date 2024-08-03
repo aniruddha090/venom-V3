@@ -35,6 +35,8 @@ This repository contains a Telegram bot designed to perform DDoS attacks. The bo
    pip install flask
    pip install aiogram
    pip install pyTelegramBotAPI
+   pip install python-dotenv
+
    ```
 
 ### Configuration
